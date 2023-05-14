@@ -50,6 +50,7 @@ StreamConfigDialog::StreamConfigDialog(Port &port, uint streamIndex,
     setupUi(this);
     setupUiExtra();
 
+
     for (int i = ProtoMin; i < ProtoMax; i++)
     {
         bgProto[i]->setProperty("ProtocolLevel", i);
@@ -57,6 +58,7 @@ StreamConfigDialog::StreamConfigDialog(Port &port, uint streamIndex,
         connect(bgProto[i], SIGNAL(buttonClicked(int)),
             this, SLOT(updateProtocol(int)));
     }
+
 
     //! \todo causes a crash!
 #if 0    
@@ -72,6 +74,7 @@ StreamConfigDialog::StreamConfigDialog(Port &port, uint streamIndex,
     connect(rbL3None, SIGNAL(toggled(bool)), SLOT(forceProtocolNone(bool)));
     connect(rbL4None, SIGNAL(toggled(bool)), SLOT(forceProtocolNone(bool)));
 
+
     // If L1/L2(FT)/L3/L4 = Other, force subsequent protocol to Other and 
     // disable the subsequent protocol group as well
     connect(rbL1Other, SIGNAL(toggled(bool)), rbFtOther, SLOT(setChecked(bool)));
@@ -82,6 +85,7 @@ StreamConfigDialog::StreamConfigDialog(Port &port, uint streamIndex,
     connect(rbL3Other, SIGNAL(toggled(bool)), gbL4Proto, SLOT(setDisabled(bool)));
     connect(rbL4Other, SIGNAL(toggled(bool)), rbPayloadOther, SLOT(setChecked(bool)));
     connect(rbL4Other, SIGNAL(toggled(bool)), gbPayloadProto, SLOT(setDisabled(bool)));
+
 
     // Setup valid subsequent protocols for L2 to L4 protocols
     for (int i = ProtoL2; i <= ProtoL4; i++)
@@ -111,7 +115,6 @@ StreamConfigDialog::StreamConfigDialog(Port &port, uint streamIndex,
                                     btn2, SLOT(setDisabled(bool)));
                     }
                 }
-
                 // If btn1 has no subsequent valid protocols, 
                 // force subsequent Protocol to 'None'
                 if (validProtocolCount == 0)
@@ -127,8 +130,9 @@ StreamConfigDialog::StreamConfigDialog(Port &port, uint streamIndex,
                         SLOT(click()));
                 }
             }
-        }
+       }
     }
+
 
     mpAvailableProtocolsModel = new QStringListModel(
         OstProtocolManager->protocolDatabase(), this);
@@ -146,7 +150,9 @@ StreamConfigDialog::StreamConfigDialog(Port &port, uint streamIndex,
         this, SLOT(when_lvSelectedProtocols_currentChanged(const QModelIndex&,
             const QModelIndex&)));
 
+qDebug("Load Current Stream start");
     LoadCurrentStream();
+qDebug("Load Current Stream end");
     mpPacketModel = new PacketModel(this);
     tvPacketTree->setModel(mpPacketModel);
 #ifdef QT_NO_DEBUG
@@ -249,8 +255,13 @@ void StreamConfigDialog::setupUiExtra()
     bgProto[ProtoL4]->addButton(rbL4Udp, OstProto::Protocol::kUdpFieldNumber);
     bgProto[ProtoL4]->addButton(rbL4Icmp, OstProto::Protocol::kIcmpFieldNumber);
     bgProto[ProtoL4]->addButton(rbL4Igmp, OstProto::Protocol::kIgmpFieldNumber);
-    bgProto[ProtoL4]->addButton(rbL4Mld, OstProto::Protocol::kMldFieldNumber);
+//    bgProto[ProtoL4]->addButton(rbL4Mld, OstProto::Protocol::kMldFieldNumber);
     bgProto[ProtoL4]->addButton(rbL4Other, ButtonIdOther);
+//    qDebug("UDP cksum = %hu", cksum);
+
+    qDebug("Add sctp button");
+    bgProto[ProtoL4]->addButton(rbL4Sctp, OstProto::Protocol::kSctpFieldNumber);
+    qDebug("Done sctp button");
 #endif
 
     bgProto[ProtoL5] = new QButtonGroup();

@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>634</width>
-    <height>507</height>
+    <width>714</width>
+    <height>512</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -146,8 +146,8 @@ QLineEdit:enabled[inputMask = "HH HH HH HH HH HH; "] { background-color: #ccccff
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>592</width>
-            <height>269</height>
+            <width>659</width>
+            <height>332</height>
            </rect>
           </property>
           <attribute name="label" >
@@ -415,6 +415,13 @@ QLineEdit:enabled[inputMask = "HH HH HH HH HH HH; "] { background-color: #ccccff
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QRadioButton" name="Chunk" >
+                <property name="text" >
+                 <string>Chunk</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -468,78 +475,134 @@ QLineEdit:enabled[inputMask = "HH HH HH HH HH HH; "] { background-color: #ccccff
              <property name="title" >
               <string>L4</string>
              </property>
-             <layout class="QGridLayout" >
-              <item row="0" column="0" >
-               <widget class="QRadioButton" name="rbL4None" >
-                <property name="text" >
-                 <string>None</string>
-                </property>
-                <property name="checked" >
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1" >
-               <widget class="QRadioButton" name="rbL4Icmp" >
-                <property name="enabled" >
-                 <bool>false</bool>
-                </property>
-                <property name="text" >
-                 <string>ICMP</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2" >
-               <widget class="QRadioButton" name="rbL4Igmp" >
-                <property name="enabled" >
-                 <bool>false</bool>
-                </property>
-                <property name="text" >
-                 <string>IGMP</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0" >
-               <widget class="QRadioButton" name="rbL4Tcp" >
-                <property name="enabled" >
-                 <bool>false</bool>
-                </property>
-                <property name="text" >
-                 <string>TCP</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1" >
-               <widget class="QRadioButton" name="rbL4Udp" >
-                <property name="enabled" >
-                 <bool>false</bool>
-                </property>
-                <property name="text" >
-                 <string>UDP</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2" >
-               <widget class="QRadioButton" name="rbL4Other" >
-                <property name="enabled" >
-                 <bool>false</bool>
-                </property>
-                <property name="text" >
-                 <string>Other</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="3" >
-               <widget class="QRadioButton" name="rbL4Mld" >
-                <property name="enabled" >
-                 <bool>false</bool>
-                </property>
-                <property name="text" >
-                 <string>MLD</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QRadioButton" name="rbL4None" >
+              <property name="geometry" >
+               <rect>
+                <x>11</x>
+                <y>49</y>
+                <width>52</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text" >
+               <string>None</string>
+              </property>
+              <property name="checked" >
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="rbL4Icmp" >
+              <property name="enabled" >
+               <bool>false</bool>
+              </property>
+              <property name="geometry" >
+               <rect>
+                <x>69</x>
+                <y>49</y>
+                <width>52</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text" >
+               <string>ICMP</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="rbL4Igmp" >
+              <property name="enabled" >
+               <bool>false</bool>
+              </property>
+              <property name="geometry" >
+               <rect>
+                <x>130</x>
+                <y>50</y>
+                <width>52</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text" >
+               <string>IGMP</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="rbL4Tcp" >
+              <property name="enabled" >
+               <bool>false</bool>
+              </property>
+              <property name="geometry" >
+               <rect>
+                <x>11</x>
+                <y>99</y>
+                <width>52</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text" >
+               <string>TCP</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="rbL4Udp" >
+              <property name="enabled" >
+               <bool>false</bool>
+              </property>
+              <property name="geometry" >
+               <rect>
+                <x>69</x>
+                <y>99</y>
+                <width>52</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text" >
+               <string>UDP</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="rbL4Other" >
+              <property name="enabled" >
+               <bool>false</bool>
+              </property>
+              <property name="geometry" >
+               <rect>
+                <x>10</x>
+                <y>140</y>
+                <width>52</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text" >
+               <string>Other</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="rbL4Mld" >
+              <property name="enabled" >
+               <bool>false</bool>
+              </property>
+              <property name="geometry" >
+               <rect>
+                <x>281</x>
+                <y>49</y>
+                <width>48</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text" >
+               <string>MLD</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="rbL4Sctp" >
+              <property name="enabled" >
+               <bool>false</bool>
+              </property>
+              <property name="geometry" >
+               <rect>
+                <x>130</x>
+                <y>100</y>
+                <width>90</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text" >
+               <string>SCTP</string>
+              </property>
+             </widget>
             </widget>
            </item>
            <item row="1" column="3" >
@@ -598,8 +661,8 @@ QLineEdit:enabled[inputMask = "HH HH HH HH HH HH; "] { background-color: #ccccff
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>250</width>
-            <height>135</height>
+            <width>297</width>
+            <height>160</height>
            </rect>
           </property>
           <attribute name="label" >
