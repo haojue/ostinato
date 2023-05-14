@@ -23,15 +23,27 @@ package OstProto;
 
 // UDP
 message Udp {
-    optional bool is_override_src_port = 1;
-    optional bool is_override_dst_port = 2;
-    optional bool is_override_totlen = 3;
-    optional bool is_override_cksum = 4;
 
-    optional uint32 src_port = 5 [default = 49152];
-    optional uint32 dst_port = 6 [default = 49153];
-    optional uint32 totlen = 7;
-    optional uint32 cksum = 8;
+    enum PortMode {
+        e_pm_fixed = 0;
+        e_pm_inc_port = 1;
+        e_pm_dec_port = 2;
+        e_pm_random_port = 3;
+    }
+
+    optional bool is_override_totlen = 1;
+    optional bool is_override_cksum = 2;
+
+    optional uint32 src_port = 3 [default = 49152];
+    optional uint32 dst_port = 4 [default = 49153];
+    optional uint32 totlen = 5;
+    optional uint32 cksum = 6;
+    optional PortMode    src_port_mode = 7 [default = e_pm_dec_port];
+    optional uint32      src_port_count = 8 [default = 16];
+    optional PortMode    dst_port_mode = 9 [default = e_pm_fixed];
+    optional uint32      dst_port_count = 10 [default = 16];   
+    optional bool is_override_src_port = 11;
+    optional bool is_override_dst_port = 12;
 }
 
 extend Protocol {

@@ -43,6 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #include "mld.h"    
 #include "tcp.h"    
 #include "udp.h"    
+#include "sctp.h"
 #include "textproto.h"
 #include "userscript.h"
 #include "hexdump.h"
@@ -103,6 +104,8 @@ ProtocolManager::ProtocolManager()
             (void*) TcpProtocol::createInstance);
     registerProtocol(OstProto::Protocol::kUdpFieldNumber,
             (void*) UdpProtocol::createInstance);
+    registerProtocol(OstProto::Protocol::kSctpFieldNumber,
+            (void*) SctpProtocol::createInstance); 
     registerProtocol(OstProto::Protocol::kTextProtocolFieldNumber,
             (void*) TextProtocol::createInstance);
 
@@ -156,6 +159,7 @@ void ProtocolManager::populateNeighbourProtocols()
         {
             foreach(AbstractProtocol *q, protocolList)
             {
+//                qDebug("protocol type is ");
                 if (q->protocolId(p->protocolIdType()))
                     neighbourProtocols.insert(
                         p->protocolNumber(), q->protocolNumber());

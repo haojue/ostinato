@@ -26,6 +26,10 @@ UdpConfigForm::UdpConfigForm(QWidget *parent)
     : QWidget(parent)
 {
     setupUi(this);
+    connect(cmbSrcPortMode, SIGNAL(currentIndexChanged(int)),
+        this, SLOT(on_cmbSrcPortMode_currentIndexChanged(int)));
+    connect(cmbDstPortMode, SIGNAL(currentIndexChanged(int)),
+        this, SLOT(on_cmbDstPortMode_currentIndexChanged(int)));
 }
 
 UdpProtocol::UdpProtocol(StreamBase *stream, AbstractProtocol *parent)
@@ -37,6 +41,30 @@ UdpProtocol::UdpProtocol(StreamBase *stream, AbstractProtocol *parent)
 UdpProtocol::~UdpProtocol()
 {
     delete configForm;
+}
+
+void UdpConfigForm::on_cmbSrcPortMode_currentIndexChanged(int index)
+{
+    if (index == OstProto::Udp::e_pm_fixed)
+    {
+        leSrcPortCount->setDisabled(true);
+    }
+    else
+    {
+        leSrcPortCount->setEnabled(true);
+    }
+}
+
+void UdpConfigForm::on_cmbDstPortMode_currentIndexChanged(int index)
+{
+    if (index == OstProto::Udp::e_pm_fixed)
+    {
+        leDstPortCount->setDisabled(true);
+    }
+    else
+    {
+        leDstPortCount->setEnabled(true);
+    }
 }
 
 AbstractProtocol* UdpProtocol::createInstance(StreamBase *stream,
@@ -80,6 +108,7 @@ AbstractProtocol::ProtocolIdType UdpProtocol::protocolIdType() const
 
 quint32 UdpProtocol::protocolId(ProtocolIdType type) const
 {
+    qDebug("######################## return UDP 0x11####################");
     switch(type)
     {
         case ProtocolIdIp: return 0x11;
@@ -111,8 +140,12 @@ AbstractProtocol::FieldFlags UdpProtocol::fieldFlags(int index) const
             flags |= CksumField;
             break;
 
-        case udp_isOverrideSrcPort:
-        case udp_isOverrideDstPort:
+//        case udp_isOverrideSrcPort:
+//        case udp_isOverrideDstPort:
+       case udp_srcMode:
+       case udp_dstMode:
+       case udp_srcCount:
+       case udp_dstCount: 
         case udp_isOverrideTotLen:
         case udp_isOverrideCksum:
             flags &= ~FrameField;
@@ -135,22 +168,45 @@ QVariant UdpProtocol::fieldData(int index, FieldAttrib attrib,
     {
         case udp_srcPort:
         {
+            int        u;
             quint16 srcPort;
 
-            switch(attrib)
+//            switch(attrib)
+//            {
+//                case FieldValue:
+//                case FieldFrameValue:
+//                case FieldTextValue:
+ //                   if (data.is_override_src_port())
+//                        srcPort = data.src_port();
+//                    else
+//                        srcPort = payloadProtocolId(ProtocolIdTcpUdp);
+//                    break;
+//                default:
+//                    srcPort = 0; // avoid the 'maybe used unitialized' warning
+//                    break;
+//            }
+
+            switch(data.src_port_mode())
             {
-                case FieldValue:
-                case FieldFrameValue:
-                case FieldTextValue:
-                    if (data.is_override_src_port())
-                        srcPort = data.src_port();
-                    else
-                        srcPort = payloadProtocolId(ProtocolIdTcpUdp);
+                case OstProto::Udp::e_pm_fixed:
+                    srcPort = data.src_port();
                     break;
+                case OstProto::Udp::e_pm_inc_port:
+                u = streamIndex % data.src_port_count();
+//              qFatal("In mode incremental, %d %d %d",data.src_port_count(), streamIndex, u);
+                srcPort = data.src_port() + u;
+                break;
+                case OstProto::Udp::e_pm_dec_port:
+                u = streamIndex % data.src_port_count();
+                srcPort = data.src_port() - u;
+                break;
+                case OstProto::Udp::e_pm_random_port:
+                srcPort = qrand() % 65535 + 1;
+                break;
                 default:
-                    srcPort = 0; // avoid the 'maybe used unitialized' warning
-                    break;
+                    qWarning("Unhandled src_port_mode = %d", data.src_port_mode());
             }
+
             switch(attrib)
             {
                 case FieldName:            
@@ -173,22 +229,29 @@ QVariant UdpProtocol::fieldData(int index, FieldAttrib attrib,
         }
         case udp_dstPort:
         {
+            int        u;
             quint16 dstPort;
 
-            switch(attrib)
+            switch(data.dst_port_mode())
             {
-                case FieldValue:
-                case FieldFrameValue:
-                case FieldTextValue:
-                    if (data.is_override_dst_port())
-                        dstPort = data.dst_port();
-                    else
-                        dstPort = payloadProtocolId(ProtocolIdTcpUdp);
+                case OstProto::Udp::e_pm_fixed:
+                    dstPort = data.dst_port();
                     break;
+                case OstProto::Udp::e_pm_inc_port:
+                u = streamIndex % data.dst_port_count();
+                dstPort = data.dst_port() + u;
+                break;
+                case OstProto::Udp::e_pm_dec_port:
+                u = streamIndex % data.dst_port_count();
+                dstPort = data.dst_port() - u;
+                break;
+                case OstProto::Udp::e_pm_random_port:
+                dstPort = qrand() % 65535 + 1; 
+                break;
                 default:
-                    dstPort = 0; // avoid the 'maybe used unitialized' warning
-                    break;
+                    qWarning("Unhandled dst_port_mode = %d", data.dst_port_mode());
             }
+
             switch(attrib)
             {
                 case FieldName:            
@@ -299,28 +362,29 @@ QVariant UdpProtocol::fieldData(int index, FieldAttrib attrib,
         }
 
         // Meta fields
-        case udp_isOverrideSrcPort:
-        {
-            switch(attrib)
-            {
-                case FieldValue:
-                    return data.is_override_src_port();
-                default:
-                    break;
-            }
-            break;
-        }
-        case udp_isOverrideDstPort:
-        {
-            switch(attrib)
-            {
-                case FieldValue:
-                    return data.is_override_dst_port();
-                default:
-                    break;
-            }
-            break;
-        }
+//        case udp_isOverrideSrcPort:
+//        {
+//            switch(attrib)
+//            {
+//                case FieldValue:
+//                    return data.is_override_src_port();
+//               default:
+//                    break;
+//            }
+//            break;
+//        }
+//        case udp_isOverrideDstPort:
+//        {
+//            switch(attrib)
+//            {
+//                case FieldValue:
+//                    return data.is_override_dst_port();
+//                default:
+//                    break;
+//            }
+//            break;
+//        }
+
         case udp_isOverrideTotLen:
         {
             switch(attrib)
@@ -344,6 +408,11 @@ QVariant UdpProtocol::fieldData(int index, FieldAttrib attrib,
             break;
         }
 
+       case udp_srcMode:
+       case udp_dstMode:
+       case udp_srcCount:
+       case udp_dstCount:
+       break;
         default:
             qFatal("%s: unimplemented case %d in switch", __PRETTY_FUNCTION__,
                 index);
@@ -363,18 +432,20 @@ bool UdpProtocol::setFieldData(int index, const QVariant& value,
 
     switch (index)
     {
-        case udp_isOverrideSrcPort:
-        {
-            data.set_is_override_src_port(value.toBool());
-            isOk = true;
-            break;
-        }
-        case udp_isOverrideDstPort:
-        {
-            data.set_is_override_dst_port(value.toBool());
-            isOk = true;
-            break;
-        }
+
+//       case udp_isOverrideSrcPort:
+//        {
+//            data.set_is_override_src_port(value.toBool());
+//            isOk = true;
+//           break;
+//        }
+//        case udp_isOverrideDstPort:
+//        {
+//            data.set_is_override_dst_port(value.toBool());
+//            isOk = true;
+//            break;
+//        }
+
         case udp_isOverrideTotLen:
         {
             data.set_is_override_totlen(value.toBool());
@@ -415,7 +486,12 @@ bool UdpProtocol::setFieldData(int index, const QVariant& value,
                 data.set_cksum(cksum);
             break;
         }
-        default:
+       case udp_srcMode:
+       case udp_dstMode:
+       case udp_srcCount:
+       case udp_dstCount:
+       break;  
+       default:
             qFatal("%s: unimplemented case %d in switch", __PRETTY_FUNCTION__,
                 index);
             break;
@@ -453,22 +529,34 @@ QWidget* UdpProtocol::configWidget()
 
 void UdpProtocol::loadConfigWidget()
 {
+    qDebug("######################## Load stream####################");
     configWidget();
 
-    configForm->leUdpSrcPort->setText(
-        fieldData(udp_srcPort, FieldValue).toString());
-    configForm->cbUdpSrcPortOverride->setChecked(
-        fieldData(udp_isOverrideSrcPort, FieldValue).toBool());
-    configForm->leUdpDstPort->setText(
-        fieldData(udp_dstPort, FieldValue).toString());
-    configForm->cbUdpDstPortOverride->setChecked(
-        fieldData(udp_isOverrideDstPort, FieldValue).toBool());
+//    configForm->leUdpSrcPort->setText(
+//        fieldData(udp_srcPort, FieldValue).toString());
+//    configForm->cbUdpSrcPortOverride->setChecked(
+ //       fieldData(udp_isOverrideSrcPort, FieldValue).toBool());
+//    configForm->leUdpDstPort->setText(
+//        fieldData(udp_dstPort, FieldValue).toString());
+//    configForm->cbUdpDstPortOverride->setChecked(
+//        fieldData(udp_isOverrideDstPort, FieldValue).toBool());
 
+
+    configForm->leUdpSrcPort->setText(QString().setNum(data.src_port()));
+    configForm->cmbSrcPortMode->setCurrentIndex(data.src_port_mode());
+    configForm->leSrcPortCount->setText(QString().setNum(data.src_port_count()));
+
+    configForm->leUdpDstPort->setText(QString().setNum(data.dst_port()));
+    configForm->cmbDstPortMode->setCurrentIndex(data.dst_port_mode());
+    configForm->leDstPortCount->setText(QString().setNum(data.dst_port_count()));
+    
+     qDebug("#####################Before load length###############");
     configForm->leUdpLength->setText(
         fieldData(udp_totLen, FieldValue).toString());
     configForm->cbUdpLengthOverride->setChecked(
         fieldData(udp_isOverrideTotLen, FieldValue).toBool());
 
+    qDebug("#####################Before load checksum###############"); 
     configForm->leUdpCksum->setText(QString("%1").arg(
         fieldData(udp_cksum, FieldValue).toUInt(), 4, BASE_HEX, QChar('0')));
     configForm->cbUdpCksumOverride->setChecked(
@@ -477,16 +565,35 @@ void UdpProtocol::loadConfigWidget()
 
 void UdpProtocol::storeConfigWidget()
 {
+   qDebug("######################## store Stream####################");
     bool isOk;
 
     configWidget();
 
+//    setFieldData(udp_srcPort, configForm->leUdpSrcPort->text());
+//    setFieldData(udp_isOverrideSrcPort, 
+//        configForm->cbUdpSrcPortOverride->isChecked());
+//    setFieldData(udp_dstPort, configForm->leUdpDstPort->text());
+//    setFieldData(udp_isOverrideDstPort, 
+//        configForm->cbUdpDstPortOverride->isChecked());
+
+
     setFieldData(udp_srcPort, configForm->leUdpSrcPort->text());
-    setFieldData(udp_isOverrideSrcPort, 
-        configForm->cbUdpSrcPortOverride->isChecked());
+//    setFieldData(udp_srcMode, configForm->cmbSrcPortMode->currentIndex());
+    data.set_src_port_mode((OstProto::Udp_PortMode)configForm->cmbSrcPortMode->currentIndex());
+    setFieldData(udp_srcCount, configForm->leSrcPortCount->text());
+//    data.set_src_port_count(configForm->leSrcPortCount->text());
+
+//    setFieldData(udp_srcMode, configForm->cmbSrcPortMode->currentIndex());
+ 
+//    data.set_src_ip_mode((OstProto::Ip4_IpAddrMode)configForm->cmbIpSrcAddrMode->currentIndex());
+//    setFieldData(udp_isOverrideSrcPort,
+//         configForm->cbUdpSrcPortOverride->isChecked());
+
+
     setFieldData(udp_dstPort, configForm->leUdpDstPort->text());
-    setFieldData(udp_isOverrideDstPort, 
-        configForm->cbUdpDstPortOverride->isChecked());
+//    setFieldData(udp_isOverrideDstPort, 
+//         configForm->cbUdpDstPortOverride->isChecked());
 
     setFieldData(udp_totLen, configForm->leUdpLength->text());
     setFieldData(udp_isOverrideTotLen, 

@@ -30,6 +30,9 @@ class UdpConfigForm : public QWidget, public Ui::udp
     Q_OBJECT
 public:
     UdpConfigForm(QWidget *parent = 0);
+private slots:
+    void on_cmbSrcPortMode_currentIndexChanged(int index);
+    void on_cmbDstPortMode_currentIndexChanged(int index);
 };
 
 class UdpProtocol : public AbstractProtocol
@@ -43,12 +46,15 @@ private:
         udp_dstPort,
         udp_totLen,
         udp_cksum,
+        udp_srcMode,
+        udp_dstMode, 
 
-        udp_isOverrideSrcPort,
-        udp_isOverrideDstPort,
+//        udp_isOverrideSrcPort,
+//        udp_isOverrideDstPort,
         udp_isOverrideTotLen,
         udp_isOverrideCksum,
-
+        udp_srcCount,
+        udp_dstCount,
         udp_fieldCount
     };
 

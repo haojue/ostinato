@@ -613,14 +613,12 @@ bool Ip4Protocol::isProtocolFrameValueVariable() const
 
 int Ip4Protocol::protocolFrameVariableCount() const
 {
-    int count = 1;
-
+    //change the default value from "1" to "2" so that when parent layer is fixed, child layer can still vary 
+    int count = 2; 
     if (data.src_ip_mode() != OstProto::Ip4::e_im_fixed)
         count = AbstractProtocol::lcm(count, data.src_ip_count());
-
     if (data.dst_ip_mode() != OstProto::Ip4::e_im_fixed)
         count = AbstractProtocol::lcm(count, data.dst_ip_count());
-
     return count;
 }
 
@@ -749,4 +747,3 @@ void Ip4Protocol::storeConfigWidget()
     data.set_dst_ip_count(configForm->leIpDstAddrCount->text().toULong(&isOk));
     data.set_dst_ip_mask(QHostAddress(configForm->leIpDstAddrMask->text()).toIPv4Address());
 }
-

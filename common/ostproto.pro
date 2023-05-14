@@ -20,6 +20,7 @@ FORMS += \
     gmp.ui \
     tcp.ui \
     udp.ui \
+    sctp.ui \
     textproto.ui \
     userscript.ui \
     hexdump.ui \
@@ -51,6 +52,7 @@ PROTOS += \
     mld.proto \
     tcp.proto \
     udp.proto \
+    sctp.proto \
     textproto.proto \
     userscript.proto \
     hexdump.proto \
@@ -96,6 +98,7 @@ HEADERS += \
     mld.h \
     tcp.h \
     udp.h \
+    sctp.h \
     textproto.h \
     userscript.h \
     hexdump.h \
@@ -132,6 +135,7 @@ SOURCES += \
     mld.cpp \
     tcp.cpp \
     udp.cpp \
+    sctp.cpp \
     textproto.cpp \
     userscript.cpp \
     hexdump.cpp \
